@@ -1,2 +1,2 @@
 addpath(genpath('./femm'));
-addpath(genpath('./helmholtz'));
+addpath(genpath('./point'));
