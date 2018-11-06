@@ -4,3 +4,12 @@ homogeneous4:
 
 loc: 9.8369e-12
 str: 5.6244e-11
+
+- noise 1%
+loc: 0.0070
+str: 0.0289
+
+- noise 5%
+
+loc: 0.0217
+str: 0.0785

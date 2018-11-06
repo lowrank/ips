@@ -1,6 +1,6 @@
-classdef pointSolver < handle
+classdef mediumSolver < handle
     % point Solver determines point sources from Cauchy data of Helmholtz
-    % equation.
+    % equation, the medium has unknown perturbation but smooth.
     
     properties (Access = public)
         refcIdx
@@ -17,7 +17,7 @@ classdef pointSolver < handle
    
     
     methods
-        function obj = pointSolver(opt)
+        function obj = mediumSolver(opt)
             % The domain is unit square with fine mesh.
             if nargin < 1 
                 opt = struct('deg', 2, 'qdeg', 4, 'min_area', 5e-5,...
@@ -308,4 +308,5 @@ classdef pointSolver < handle
     end
     
 end
+
 
