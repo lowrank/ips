@@ -1,0 +1,6 @@
+homogeneous4:
+
+- noise free.
+
+loc: 9.8369e-12
+str: 5.6244e-11
