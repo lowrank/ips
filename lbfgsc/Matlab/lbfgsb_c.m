@@ -230,8 +230,15 @@ end
 
 
 function printFcn(k,history)
-fprintf('Iter %5d, f(x) = %2e, ||grad||_infty = %.2e', ...
+
+try
+    cprintf('green',sprintf('Iter %5d, f(x) = %2e, ||grad||_infty = %.2e', ...
+    k, history(k,1), history(k,2) ));
+catch e
+    disp(e)
+    fprintf('Iter %5d, f(x) = %2e, ||grad||_infty = %.2e', ...
     k, history(k,1), history(k,2) );
+end
 for col = 3:size(history,2)
     fprintf(', %.7e', history(k,col) );
 end

@@ -1,0 +1,15 @@
+random4:
+
+- noise free.
+
+loc: 1.07e-09
+str: 5.32e-09
+
+- noise 1%
+loc: 0.0347
+str: 0.0967
+
+- noise 5%
+
+loc: 0.0513
+str: 0.0828
