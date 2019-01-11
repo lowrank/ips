@@ -35,13 +35,15 @@ classdef pointSolver < handle
                 opt.waveNum      = 8 ; %4 * sqrt(-1);
                 opt.refcIdxStyle = 'mat';
                 
-                load('refc_true_q.mat');
-                load('7.mat');
+                load('refc_true_d.mat');
+                load('1.mat');
                 load('data.mat');
                 
 
                 opt.loaded_refcIdxTrue = refc_true;
                 opt.loaded_refcIdx     = refc;
+                
+                size(opt.loaded_refcIdx)
                 opt.points             = points;
                 opt.strengths          = strengths;
                 
@@ -126,6 +128,10 @@ classdef pointSolver < handle
             end
             [obj.cache.u_ground, obj.measure.dirichlet] = ...
                 obj.forwardSolve(obj.refcIdx, gaussian_source);
+            
+            % add noise
+            obj.measure.dirichlet = obj.measure.dirichlet .* ...
+                (1 + 0.05 * (2 * rand(size(obj.measure.dirichlet)) - 1));
             figure(1);
             title('solution');
             obj.visualize(obj.cache.u_ground);
@@ -149,7 +155,6 @@ classdef pointSolver < handle
             % return Dirichlet data
             f = u(obj.cache.ndof);
             
-            f = f .* (1 + 0.0 * (2 * rand(size(f)) - 1));
             
         end
         
@@ -197,7 +202,7 @@ classdef pointSolver < handle
 %             hold off;
 %             colormap jet;view(2);
 %             drawnow();
-%             
+            
             
             [cur_u, curDirichlet] = forwardSolve(obj, obj.f_refcIdx, gaussian_source);
             mismatch = (curDirichlet - obj.measure.dirichlet);
@@ -260,18 +265,18 @@ classdef pointSolver < handle
                        
 
             
-%             figure(2);
-%             title('reconstruction');
-%             s1 = scatter3(rps_stack(1, :), rps_stack(2,:), rps_stack(3,:), 120, 'o');
-%             s1.LineWidth = 2;
-%             xlim([-0.2 1.2]);
-%             ylim([-0.2 1.2]);
-%             hold on;
-%             s2 = scatter3(obj.points(1,:), obj.points(2,:), obj.strengths, 120, 'x', 'LineWidth', 1);
-%             s2.LineWidth = 2;
-%             hold off;
-%             colormap jet;view(2);
-%             drawnow();
+            figure(2);
+            title('reconstruction');
+            s1 = scatter3(rps_stack(1, :), rps_stack(2,:), rps_stack(3,:), 120, 'o');
+            s1.LineWidth = 2;
+            xlim([-0.2 1.2]);
+            ylim([-0.2 1.2]);
+            hold on;
+            s2 = scatter3(obj.points(1,:), obj.points(2,:), obj.strengths, 120, 'x', 'LineWidth', 1);
+            s2.LineWidth = 2;
+            hold off;
+            colormap jet;view(2);
+            drawnow();
 %             
             qIdx = obj.mapping(Idx, obj.model.space.elems, obj.model.facet.ref');
             M    = obj.model.build('m', qIdx); % mass matrix
@@ -343,7 +348,7 @@ classdef pointSolver < handle
 
             if nargin < 2
                 pre_rps = reshape([obj.points; obj.strengths], 3 * length(obj.strengths), 1) ;
-                rps = pre_rps + 0. * (2 * rand(size(pre_rps)) - 1);
+                rps = pre_rps + 0.05 * (2 * rand(size(pre_rps)) - 1);
 %                   rps = rand(300, 1);
             end
             
@@ -384,7 +389,7 @@ classdef pointSolver < handle
             end
             
             options    = struct( 'factr', 1e0, 'pgtol', 1e-10, 'm', 80, ...
-                'x0', rps_all, 'maxIts', 4000, 'maxTotalIts', 1e5);
+                'x0', rps_all, 'maxIts', 2000, 'maxTotalIts', 1e5);
             
             options.printEvery     = 1;            
             
