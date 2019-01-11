@@ -35,8 +35,8 @@ classdef pointSolver < handle
                 opt.waveNum      = 8 ; %4 * sqrt(-1);
                 opt.refcIdxStyle = 'mat';
                 
-                load('refc_true_d.mat');
-                load('1.mat');
+                load('refc_true_s.mat');
+                load('6.mat');
                 load('data.mat');
                 
 
@@ -204,7 +204,7 @@ classdef pointSolver < handle
 %             drawnow();
             
             
-            [cur_u, curDirichlet] = forwardSolve(obj, obj.f_refcIdx, gaussian_source);
+            [cur_u, curDirichlet] = forwardSolve(obj, obj.refcIdx, gaussian_source);
             mismatch = (curDirichlet - obj.measure.dirichlet);
             
             
@@ -348,7 +348,7 @@ classdef pointSolver < handle
 
             if nargin < 2
                 pre_rps = reshape([obj.points; obj.strengths], 3 * length(obj.strengths), 1) ;
-                rps = pre_rps + 0.05 * (2 * rand(size(pre_rps)) - 1);
+                rps = pre_rps + 0.1 * (2 * rand(size(pre_rps)) - 1);
 %                   rps = rand(300, 1);
             end
             
@@ -383,7 +383,7 @@ classdef pointSolver < handle
             if nargin < 2
                 pre_rps = reshape([obj.points; obj.strengths], 3 * length(obj.strengths), 1) ;
                 Idx = obj.f_refcIdx;
-                rps = pre_rps + 0. * (2 * rand(size(pre_rps)) - 1);
+                rps = pre_rps + 0.1 * (2 * rand(size(pre_rps)) - 1);
 %                   rps = rand(300, 1);
                 rps_all = [Idx; rps];
             end
@@ -428,7 +428,7 @@ classdef pointSolver < handle
                 'MaxIter',500,'HessUpdate','bfgs');
             if nargin < 2
                 pre_rps = reshape([obj.points; obj.strengths], 3 * length(obj.strengths), 1) ;
-                rps = pre_rps + 0.3 * (2 * rand(size(pre_rps)) - 1);
+                rps = pre_rps + 0.1 * (2 * rand(size(pre_rps)) - 1);
 %                   rps = rand(30, 1);
             end
             [rps,fval,exitflag,output] = fminunc(@obj.backwardSolve, rps,options);
