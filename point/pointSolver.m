@@ -28,17 +28,14 @@ classdef pointSolver < handle
                       [0 0 1 0 1 1 0 1]',...
                 'idx', [0 1 1 2 2 3 3 0]');
             
-                opt.pointStyle   = 'mat';
+                opt.pointStyle   = 'random';
                 opt.pointDist    = 0.3;
                 opt.minStrength  = 0.5;
  
                 opt.waveNum      = 8 ; %4 * sqrt(-1);
-                opt.refcIdxStyle = 'mat';
+                opt.refcIdxStyle = 'random';
                 
-                load('refc_true_s.mat');
-                load('6.mat');
-                load('data.mat');
-                
+              
 
                 opt.loaded_refcIdxTrue = refc_true;
                 opt.loaded_refcIdx     = refc;
@@ -204,7 +201,7 @@ classdef pointSolver < handle
 %             drawnow();
             
             
-            [cur_u, curDirichlet] = forwardSolve(obj, obj.refcIdx, gaussian_source);
+            [~, curDirichlet] = forwardSolve(obj, obj.refcIdx, gaussian_source);
             mismatch = (curDirichlet - obj.measure.dirichlet);
             
             
