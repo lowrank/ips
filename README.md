@@ -1,7 +1,7 @@
 # ips
 imaging point sources
 
-# to build the source code, in MATLAB.
+# Build the source code
 ```
 cd femm
 make
@@ -9,7 +9,7 @@ cd ../lbfgsc/src
 make
 ```
 
-# to run the code
+# Run the code
 ```
 load ./data/options/homogeneous4
 ps = pointSolver(opt)
