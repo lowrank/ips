@@ -22,31 +22,6 @@ classdef pointSolver < handle
     methods
         function obj = pointSolver(opt)
             % The domain is unit square with fine mesh.
-            if nargin < 1 
-                opt = struct('deg', 2, 'qdeg', 6, 'min_area', 1e-4,...
-                      'edge', [0 1 1 0; 0 0 1 1], 'hull',...
-                      [0 0 1 0 1 1 0 1]',...
-                'idx', [0 1 1 2 2 3 3 0]');
-            
-                opt.pointStyle   = 'random';
-                opt.pointDist    = 0.3;
-                opt.minStrength  = 0.5;
- 
-                opt.waveNum      = 8 ; %4 * sqrt(-1);
-                opt.refcIdxStyle = 'random';
-                
-              
-
-                opt.loaded_refcIdxTrue = refc_true;
-                opt.loaded_refcIdx     = refc;
-                
-                size(opt.loaded_refcIdx)
-                opt.points             = points;
-                opt.strengths          = strengths;
-                
-           
-                
-            end
 
             % generate mesh
             cprintf('cyan',                 '1. Generating triangulation mesh   ...\t');
@@ -123,15 +98,23 @@ classdef pointSolver < handle
             
                 end
             end
+            
+            qIdx = obj.mapping(obj.refcIdx, obj.model.space.elems, obj.model.facet.ref');
+            obj.cache.S =  obj.model.build('s', 1);
+            obj.cache.M =  obj.model.build('m', qIdx);
+            obj.cache.A = obj.cache.k^2 * obj.cache.M - obj.cache.S;
+            
             [obj.cache.u_ground, obj.measure.dirichlet] = ...
                 obj.forwardSolve(obj.refcIdx, gaussian_source);
             
             % add noise
             obj.measure.dirichlet = obj.measure.dirichlet .* ...
-                (1 + 0.05 * (2 * rand(size(obj.measure.dirichlet)) - 1));
+                (1 + 0.0 * (2 * rand(size(obj.measure.dirichlet)) - 1));
             figure(1);
             title('solution');
             obj.visualize(obj.cache.u_ground);
+            
+
         end
         
         function [u, f] = forwardSolve(obj, Idx, gaussian_source)
@@ -140,11 +123,11 @@ classdef pointSolver < handle
             
             % projection by interpolation, find quadrature point values.
             
-            qIdx = obj.mapping(Idx, obj.model.space.elems, obj.model.facet.ref');
-            M    = obj.model.build('m', qIdx); % mass matrix
-            S    = obj.model.build('s', 1);    % stiffness matrix
             
-            obj.cache.A    = obj.cache.k^2 * M - S;
+%             M    = obj.model.build('m', qIdx); % mass matrix
+%             S    = obj.model.build('s', 1);    % stiffness matrix
+            
+            
             % solve Neumann problem.
             load  = obj.model.build('l', gaussian_source);
             u = obj.cache.A \load; 
@@ -199,7 +182,7 @@ classdef pointSolver < handle
 %             hold off;
 %             colormap jet;view(2);
 %             drawnow();
-            
+%             
             
             [~, curDirichlet] = forwardSolve(obj, obj.refcIdx, gaussian_source);
             mismatch = (curDirichlet - obj.measure.dirichlet);
@@ -262,18 +245,18 @@ classdef pointSolver < handle
                        
 
             
-            figure(2);
-            title('reconstruction');
-            s1 = scatter3(rps_stack(1, :), rps_stack(2,:), rps_stack(3,:), 120, 'o');
-            s1.LineWidth = 2;
-            xlim([-0.2 1.2]);
-            ylim([-0.2 1.2]);
-            hold on;
-            s2 = scatter3(obj.points(1,:), obj.points(2,:), obj.strengths, 120, 'x', 'LineWidth', 1);
-            s2.LineWidth = 2;
-            hold off;
-            colormap jet;view(2);
-            drawnow();
+%             figure(2);
+%             title('reconstruction');
+%             s1 = scatter3(rps_stack(1, :), rps_stack(2,:), rps_stack(3,:), 120, 'o');
+%             s1.LineWidth = 2;
+%             xlim([-0.2 1.2]);
+%             ylim([-0.2 1.2]);
+%             hold on;
+%             s2 = scatter3(obj.points(1,:), obj.points(2,:), obj.strengths, 120, 'x', 'LineWidth', 1);
+%             s2.LineWidth = 2;
+%             hold off;
+%             colormap jet;view(2);
+%             drawnow();
 %             
             qIdx = obj.mapping(Idx, obj.model.space.elems, obj.model.facet.ref');
             M    = obj.model.build('m', qIdx); % mass matrix
@@ -345,7 +328,7 @@ classdef pointSolver < handle
 
             if nargin < 2
                 pre_rps = reshape([obj.points; obj.strengths], 3 * length(obj.strengths), 1) ;
-                rps = pre_rps + 0.1 * (2 * rand(size(pre_rps)) - 1);
+                rps = pre_rps + 0.15 * (2 * rand(size(pre_rps)) - 1);
 %                   rps = rand(300, 1);
             end
             
@@ -425,7 +408,9 @@ classdef pointSolver < handle
                 'MaxIter',500,'HessUpdate','bfgs');
             if nargin < 2
                 pre_rps = reshape([obj.points; obj.strengths], 3 * length(obj.strengths), 1) ;
-                rps = pre_rps + 0.1 * (2 * rand(size(pre_rps)) - 1);
+                d = obj.minDist(obj.points);
+                fprintf('min dist is %6.2f\n\n', d);
+                rps = pre_rps + d * 0.4 * (2 * rand(size(pre_rps)) - 1);
 %                   rps = rand(30, 1);
             end
             [rps,fval,exitflag,output] = fminunc(@obj.backwardSolve, rps,options);
